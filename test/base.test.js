@@ -58,88 +58,258 @@ describe('Basic library tests', () => {
     })
 
     test('should retrieve response from llm', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'browser',
+                method: 'AxiomApiAiGeneric',
+                params: [{}],
+                cdpLink: ''
+            })
+            .reply(200, [
+                ['AI response']
+            ])
         const results = await axiomApi.integrateAI({})
-        expect(true).toBe(false)
+        expect(results).toStrictEqual([['AI response']])
     })
 
     test('should interact with a date picker', async() => {
-        const results = await axiomApi.datePicker('October', '.button', 'November', '13')
-        expect(true).toBe(false)
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.datePicker',
+                params: ['.datepicker', '.button', 'November', 13],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
+        const results = await axiomApi.datePicker('.datepicker', '.button', 'November', 13)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should click', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.clickV3130',
+                params: ['.button', false, false],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.click('.button', false, false)
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should click engagement button', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.clickEngagementButton',
+                params: ['.button','Liked'],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.clickEngagementButton('.button', 'Liked')
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should click multiple', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.multiClickV3170',
+                params: ['.button', false, 0],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.clickMultiple('.button', false, 0)
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should get clipboard contents', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.readClipboardContents',
+                params: [],
+                cdpLink: ''
+            })
+            .reply(200, 
+                [['Clipboard contents']]
+            )
         const results = await axiomApi.getClipboardContents()
-        expect(true).toBe(false)
+        expect(results).toStrictEqual([['Clipboard contents']])
     })
 
     test('should enter text', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.enterTextV4500',
+                params: ['.input', 'The Text', 0, false, null, false],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.enterText('.input', 'The Text', 0, false, null, false)
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should go to a new page', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.gotoV4070',
+                params: ['https://wwww.axiom.ai', null, true, false],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.goto('https://wwww.axiom.ai', true, false)
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should press keys', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.keydownV3120',
+                params: ['Space', null, '|', 0],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.pressKeys('Space', '|', 0)
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should click and drag', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.mouseClickDragV0300',
+                params: [{x: 0, y: 0}, {x: 100, y: 100}],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.clickAndDrag({x: 0, y: 0}, {x: 100, y: 100})
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should scrape metadata', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.scrapeMetadata',
+                params: [{}],
+                cdpLink: ''
+            })
+            .reply(200, 
+                [['Page metadata']]
+            )
         const results = await axiomApi.scrapeMetadata({})
-        expect(true).toBe(false)
+        expect(results).toStrictEqual([['Page metadata']])
     })
 
     test('should interact with select list', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.selectList',
+                params: ['.select', 'The Text'],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.selectList('.select', 'The Text')
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should solve captcha', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.solveCaptchaV450',
+                params: [null, null, 'apiKey'],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.solveCaptcha('apiKey')
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should switch browser tab', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.switchBrowserTab',
+                params: [1],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.switchBrowserTab(1)
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should wait', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.waitV4000',
+                params: [{}],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.wait({})
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should hover', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'driver.hover',
+                params: ['.button'],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.hover('.button')
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
     test('should restart browser', async() => {
+        nock('https://lar-simon.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'browser',
+                method: 'AxiomApiRestartBrowser',
+                params: [],
+                cdpLink: ''
+            })
+            .reply(200, 
+                {message: 'Step command executed successfully.'}
+            )
         const results = await axiomApi.restartBrowser()
-        expect(true).toBe(false)
+        expect(results).toBe('Step command executed successfully.')
     })
 
 });

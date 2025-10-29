@@ -33,7 +33,9 @@ export class AxiomApi {
             },
             body: JSON.stringify({cdpLink})
         });
-        const content = await rawResponse.json();        
+        const content = await rawResponse.json();
+        // Reset CDPLink to avoid staleness
+        this.cdpLink = ''      
         return content.message
     }
 
@@ -130,8 +132,9 @@ export class AxiomApi {
     async goto(url, doNotShareLocalstorage, openInNewTab) {
         return this.step(
             'driver',
-            {driver: "driver.gotoV4070"},
-            [url, null, doNotShareLocalstorage, openInNewTab]
+            'driver.gotoV4070',
+            [url, null, doNotShareLocalstorage, openInNewTab],
+            this.cdpLink
         )
     }
 
@@ -140,7 +143,7 @@ export class AxiomApi {
             'driver',
             'driver.keydownV3120',
             [key, null, delimiter, delay],
-            "interact"
+            this.cdpLink
         )
     }
 
@@ -156,7 +159,7 @@ export class AxiomApi {
     async scrapeMetadata(metadata) {
         return this.step(
             'driver',
-            { driver: "driver.scrapeMetadata" },
+            'driver.scrapeMetadata',
             [metadata],
             this.cdpLink
         )
@@ -165,7 +168,7 @@ export class AxiomApi {
     async selectList(select, text) {
         return this.step(
             'driver',
-            {driver: "driver.selectList"},
+            'driver.selectList',
             [select, text],
             this.cdpLink
         )
