@@ -76,7 +76,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.datePicker',
+                method: 'datePicker',
                 params: ['.datepicker', '.button', 'November', 13],
                 cdpLink: ''
             })
@@ -91,7 +91,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.clickV3130',
+                method: 'clickV3130',
                 params: ['.button', false, false],
                 cdpLink: ''
             })
@@ -106,7 +106,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.clickEngagementButton',
+                method: 'clickEngagementButton',
                 params: ['.button','Liked'],
                 cdpLink: ''
             })
@@ -121,7 +121,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.multiClickV3170',
+                method: 'multiClickV3170',
                 params: ['.button', false, 0],
                 cdpLink: ''
             })
@@ -136,7 +136,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.readClipboardContents',
+                method: 'readClipboardContents',
                 params: [],
                 cdpLink: ''
             })
@@ -151,7 +151,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.enterTextV4500',
+                method: 'enterTextV4500',
                 params: ['.input', 'The Text', 0, false, null, false],
                 cdpLink: ''
             })
@@ -166,7 +166,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.gotoV4070',
+                method: 'gotoV4070',
                 params: ['https://wwww.axiom.ai', null, true, false],
                 cdpLink: ''
             })
@@ -181,7 +181,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.keydownV3120',
+                method: 'keydownV3120',
                 params: ['Space', null, '|', 0],
                 cdpLink: ''
             })
@@ -196,7 +196,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.mouseClickDragV0300',
+                method: 'mouseClickDragV0300',
                 params: [{x: 0, y: 0}, {x: 100, y: 100}],
                 cdpLink: ''
             })
@@ -211,7 +211,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.scrapeMetadata',
+                method: 'scrapeMetadata',
                 params: [{}],
                 cdpLink: ''
             })
@@ -226,7 +226,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.selectList',
+                method: 'selectList',
                 params: ['.select', 'The Text'],
                 cdpLink: ''
             })
@@ -241,7 +241,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.solveCaptchaV450',
+                method: 'solveCaptchaV450',
                 params: [null, null, 'apiKey'],
                 cdpLink: ''
             })
@@ -256,7 +256,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.switchBrowserTab',
+                method: 'switchBrowserTab',
                 params: [1],
                 cdpLink: ''
             })
@@ -271,7 +271,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.waitV4000',
+                method: 'waitV4000',
                 params: [{}],
                 cdpLink: ''
             })
@@ -286,7 +286,7 @@ describe('Basic library tests', () => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
-                method: 'driver.hover',
+                method: 'hover',
                 params: ['.button'],
                 cdpLink: ''
             })

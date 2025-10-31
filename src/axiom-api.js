@@ -1,23 +1,15 @@
-const ENDPOINT = 'https://lar-simon.axiom.ai'
+import { AxiomHttp } from './axiom-http.js'
 
 export class AxiomApi {
 
     constructor(token) {
-        this.cdpLink = ''
-        this.token = token
+        this.cdpLink = '';
+        this.token = token;
+        this.http = new AxiomHttp();
     }
 
     async browserOpen() {
-        const rawResponse = await fetch(ENDPOINT + '/api/v5/browser/open', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-API-KEY': this.token
-            },
-            body: JSON.stringify([])
-        });
-        const content = await rawResponse.json();
+        const content = await this.http.post('/api/v5/browser/open', this.token)
         this.cdpLink = content.endpoint
         return content.endpoint
     }
@@ -26,16 +18,7 @@ export class AxiomApi {
         if (cdpLink) {
             cdpLink = this.cdpLink
         }
-        const rawResponse = await fetch(ENDPOINT + '/api/v5/browser/close', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-API-KEY': this.token
-            },
-            body: JSON.stringify({cdpLink})
-        });
-        const content = await rawResponse.json();
+        const content = await this.http.post('/api/v5/browser/close', this.token, {cdpLink})
         // Reset CDPLink to avoid staleness
         this.cdpLink = ''      
         return content.message
@@ -43,16 +26,9 @@ export class AxiomApi {
 
     // TODO: Probably should be mvoed to a non-user facing component
     async step(mode, method, params, cdpLink = '') {
-        const rawResponse = await fetch(ENDPOINT + '/api/v5/step', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'X-API-KEY': this.token
-            },
-            body: JSON.stringify({mode, method, params, cdpLink})
-        });
-        const content = await rawResponse.json();
+        const content = await this.http.post('/api/v5/step', this.token, {
+            mode, method, params, cdpLink
+        })
         if (content.message) {
             return content.message
         } else {
@@ -123,19 +99,19 @@ export class AxiomApi {
         )
     }
 
-    async enterText(selectTextField, text, delay, appendExisting, customLineBreak, optionalText) {
+    async enterText(selectTextField, text, delay = 0, appendExisting = false, customLineBreak = null, optionalText = false) {
         return this.step(
             'driver',
-            'driver.enterTextV4500',
+            'enterTextV4500',
             [selectTextField, text, delay, appendExisting, customLineBreak, optionalText],
             this.cdpLink
         )
     }
 
-    async goto(url, doNotShareLocalstorage, openInNewTab) {
+    async goto(url, doNotShareLocalstorage = false, openInNewTab = false) {
         return this.step(
             'driver',
-            'driver.gotoV4070',
+            'gotoV4070',
             [url, null, doNotShareLocalstorage, openInNewTab],
             this.cdpLink
         )
@@ -144,7 +120,7 @@ export class AxiomApi {
     async pressKeys(key, delimiter, delay) {
         return this.step(
             'driver',
-            'driver.keydownV3120',
+            'keydownV3120',
             [key, null, delimiter, delay],
             this.cdpLink
         )
@@ -153,7 +129,7 @@ export class AxiomApi {
     async clickAndDrag(startCoordinates, endCoordinates) {
         return this.step(
             'driver',
-            'driver.mouseClickDragV0300',
+            'mouseClickDragV0300',
             [startCoordinates, endCoordinates],
             this.cdpLink
         )
@@ -162,7 +138,7 @@ export class AxiomApi {
     async scrapeMetadata(metadata) {
         return this.step(
             'driver',
-            'driver.scrapeMetadata',
+            'scrapeMetadata',
             [metadata],
             this.cdpLink
         )
@@ -171,7 +147,7 @@ export class AxiomApi {
     async selectList(select, text) {
         return this.step(
             'driver',
-            'driver.selectList',
+            'selectList',
             [select, text],
             this.cdpLink
         )
@@ -180,7 +156,7 @@ export class AxiomApi {
     async solveCaptcha(apiKey) {
         return this.step(
             'driver',
-            'driver.solveCaptchaV450',
+            'solveCaptchaV450',
             [null, null, apiKey],
             this.cdpLink
         )
@@ -189,7 +165,7 @@ export class AxiomApi {
     async switchBrowserTab(selectTab) {
         return this.step(
             'driver',
-            'driver.switchBrowserTab',
+            'switchBrowserTab',
             [selectTab],
             this.cdpLink
         )
@@ -198,7 +174,7 @@ export class AxiomApi {
     async wait(timeOptions) {
         return this.step(
             'driver',
-            'driver.waitV4000',
+            'waitV4000',
             [timeOptions],
             this.cdpLink
         )
@@ -207,7 +183,7 @@ export class AxiomApi {
     async hover(select) {
         return this.step(
             'driver',
-            'driver.hover',
+            'hover',
             [select],
             this.cdpLink
         )
