@@ -12,7 +12,8 @@ export class AxiomApi {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-API-KEY': this.token
             },
             body: JSON.stringify([])
         });
@@ -29,7 +30,8 @@ export class AxiomApi {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-API-KEY': this.token
             },
             body: JSON.stringify({cdpLink})
         });
@@ -45,7 +47,8 @@ export class AxiomApi {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-API-KEY': this.token
             },
             body: JSON.stringify({mode, method, params, cdpLink})
         });
