@@ -15,7 +15,7 @@ export class AxiomApi {
     }
 
     async browserClose(cdpLink = '') {
-        if (cdpLink) {
+        if (!cdpLink) {
             cdpLink = this.cdpLink
         }
         const content = await this.http.post('/api/v5/browser/close', this.token, {cdpLink})

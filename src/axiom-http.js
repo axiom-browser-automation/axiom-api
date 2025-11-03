@@ -3,7 +3,6 @@ const ENDPOINT = 'https://lar-simon.axiom.ai'
 export class AxiomHttp {
 
     async post(uri, token, body) {
-        console.log(body)
         const rawResponse = await fetch(ENDPOINT + uri, {
             method: 'POST',
             headers: {
