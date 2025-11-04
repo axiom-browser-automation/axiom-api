@@ -57,7 +57,7 @@ export class AxiomApi {
     async datePicker(selectMonth, selectMonthChangeButton, changeMonthTo, changeDayOfMonthTo) {
         return this.step(
             'driver',
-            'driver.datePicker',
+            'datePicker',
             [selectMonth, selectMonthChangeButton, changeMonthTo, changeDayOfMonthTo],
             this.cdpLink
         )
@@ -66,7 +66,7 @@ export class AxiomApi {
     async click(select, leftClickRightClick, optionalClick) {
         return this.step(
             'driver',
-            'driver.clickV3130',
+            'clickV3130',
             [select, leftClickRightClick, optionalClick],
             this.cdpLink
         )
@@ -75,7 +75,7 @@ export class AxiomApi {
     async clickEngagementButton(select, setValueToCheck) {
         return this.step(
             'driver',
-            'driver.clickEngagementButton',
+            'clickEngagementButton',
             [select, setValueToCheck],
             this.cdpLink
         )
@@ -84,7 +84,7 @@ export class AxiomApi {
     async clickMultiple(select, leftClickRightClick, maxClicks) {
         return this.step(
             'driver',
-            'driver.multiClickV3170',
+            'multiClickV3170',
             [select, leftClickRightClick, maxClicks],
             this.cdpLink
         )
@@ -93,7 +93,7 @@ export class AxiomApi {
     async getClipboardContents() {
         return this.step(
             'driver',
-            'driver.readClipboardContents',
+            'readClipboardContents',
             [],
             this.cdpLink
         )
