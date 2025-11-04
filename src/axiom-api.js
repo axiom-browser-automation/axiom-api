@@ -171,13 +171,12 @@ export class AxiomApi {
         )
     }
 
-    async wait(timeOptions) {
-        return this.step(
-            'driver',
-            'waitV4000',
-            [timeOptions],
-            this.cdpLink
-        )
+    async wait(time) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve()
+            }, time)
+        })
     }
 
     async hover(select) {

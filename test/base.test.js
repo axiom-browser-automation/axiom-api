@@ -267,21 +267,6 @@ describe('Basic library tests', () => {
         expect(results).toBe('Step command executed successfully.')
     })
 
-    test('should wait', async() => {
-        nock('https://lar-simon.axiom.ai')
-            .post('/api/v5/step', {
-                mode: 'driver',
-                method: 'waitV4000',
-                params: [{}],
-                cdpLink: ''
-            })
-            .reply(200, 
-                {message: 'Step command executed successfully.'}
-            )
-        const results = await axiomApi.wait({})
-        expect(results).toBe('Step command executed successfully.')
-    })
-
     test('should hover', async() => {
         nock('https://lar-simon.axiom.ai')
             .post('/api/v5/step', {
