@@ -1,7 +1,15 @@
 import { AxiomHttp } from './axiom-http.js'
 
+/**
+ * @class
+ * @public
+ * A class for interacting with the Axiom API.
+ */
 export class AxiomApi {
 
+    /**
+     * @param {string} token API access token.
+     */
     constructor(token) {
         this.cdpLink = '';
         this.token = token;

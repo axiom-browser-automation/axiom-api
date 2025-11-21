@@ -1,20 +1,32 @@
 {
-  "name": "@axiom_ai/axiom-api",
+  "name": "axiom-api",
   "author": "Axiom.ai",
   "type": "module",
   "version": "1.0.0",
   "description": "Library for interacting with Axiom.ai browser infrastructure",
   "main": "dist/cjs/index.js",
   "module": "dist/es/index.js",
+  "types": "dist/es/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build:js": "vite build",
+    "build:types": "tsc --project tsconfig.json",
+    "build": "npm run build:js && npm run build:types",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
   },
   "exports": {
     ".": {
-      "import": "./dist/axiom-api.es.js",
-      "require": "./dist/axiom-api.cjs.js",
+      "import": {
+        "default": "./dist/axiom-api.es.js",
+        "types": "./dist/es/index.d.ts"
+      },
+      "require": {
+        "default": "./dist/axiom-api.cjs.js",
+        "types": "./dist/es/index.d.ts"
+      },
       "default": "./dist/axiom-api.es.js"
     }
   },
@@ -31,7 +43,8 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "nock": "^14.0.10",
-    "vite": "^7.1.10"
+    "vite": "^7.1.10",
+    "vite-plugin-dts": "^4.5.4"
   },
   "directories": {
     "test": "test"
