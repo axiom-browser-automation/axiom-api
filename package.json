@@ -4,6 +4,8 @@
   "type": "module",
   "version": "1.0.0",
   "description": "Library for interacting with Axiom.ai browser infrastructure",
+  "main": "dist/cjs/index.js",
+  "module": "dist/es/index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

@@ -13,7 +13,7 @@ To use the library, you'll first need to import the `AxiomApi` class and then wr
 Here is a basic example of how to structure your code:
 
 ```javascript
-import { AxiomApi } from '/path/to/library/src/axiom-api';
+import { AxiomApi } from 'axiom-api';
 
 async function run() {
     // 1. Initialize the AxiomApi class

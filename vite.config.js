@@ -4,10 +4,10 @@ import path from "path";
 export default defineConfig({
   build: {
     lib: {
-      entry: path.resolve(__dirname, "./src/axiom-api.js"),
+      entry: path.resolve(__dirname, "./index.js"),
       name: "axiom-api",
       formats: ["es", "cjs"],
-      fileName: (format) => `axiom-api.${format}.js`,
+      fileName: (format) => `${format}/index.js`,
     },
   },
 });
