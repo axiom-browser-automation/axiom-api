@@ -19,15 +19,10 @@
   },
   "exports": {
     ".": {
-      "import": {
-        "default": "./dist/axiom-api.es.js",
-        "types": "./dist/es/index.d.ts"
-      },
-      "require": {
-        "default": "./dist/axiom-api.cjs.js",
-        "types": "./dist/es/index.d.ts"
-      },
-      "default": "./dist/axiom-api.es.js"
+      "import": "./dist/es/index.js",
+      "require": "./dist/cjs/index.js",
+      "default": "./dist/es/index.js",
+      "types": "./dist/es/index.d.ts"
     }
   },
   "jest": {
