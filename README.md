@@ -17,7 +17,7 @@ import { AxiomApi } from '/path/to/library/src/axiom-api';
 
 async function run() {
     // 1. Initialize the AxiomApi class
-    const axiom = new AxiomApi();
+    const axiom = new AxiomApi('[API_KEY]');
     
     // 2. Open the browser connection
     await axiom.browserOpen();
