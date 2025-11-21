@@ -9,6 +9,13 @@
     "build": "vite build",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/axiom-api.es.js",
+      "require": "./dist/axiom-api.cjs.js",
+      "default": "./dist/axiom-api.es.js"
+    }
+  },
   "jest": {
     "testEnvironment": "node",
     "testMatch": [

@@ -1,7 +1,7 @@
 import { AxiomApi } from '../src/axiom-api.js';
 import nock from 'nock';
 
-nock('https://lar-simon.axiom.ai')
+nock('https://lar.axiom.ai')
     .post('/api/v5/browser/open')
     .reply(200, {
         endpoint: 'ws://test-cdp-link'
@@ -32,7 +32,7 @@ describe('Basic library tests', () => {
     })
 
     test('should trigger a step', async () => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step')
             .reply(200, {
                 message: 'Step command executed successfully.'
@@ -43,7 +43,7 @@ describe('Basic library tests', () => {
     })
 
     test('should scrape data', async () => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'browser',
                 method: 'AxiomApiSmartScrapeV440',
@@ -58,7 +58,7 @@ describe('Basic library tests', () => {
     })
 
     test('should retrieve response from llm', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'browser',
                 method: 'AxiomApiAiGeneric',
@@ -73,7 +73,7 @@ describe('Basic library tests', () => {
     })
 
     test('should interact with a date picker', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'datePicker',
@@ -88,7 +88,7 @@ describe('Basic library tests', () => {
     })
 
     test('should click', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'clickV3130',
@@ -103,7 +103,7 @@ describe('Basic library tests', () => {
     })
 
     test('should click engagement button', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'clickEngagementButton',
@@ -118,7 +118,7 @@ describe('Basic library tests', () => {
     })
 
     test('should click multiple', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'multiClickV3170',
@@ -133,7 +133,7 @@ describe('Basic library tests', () => {
     })
 
     test('should get clipboard contents', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'readClipboardContents',
@@ -148,7 +148,7 @@ describe('Basic library tests', () => {
     })
 
     test('should enter text', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'enterTextV4500',
@@ -163,7 +163,7 @@ describe('Basic library tests', () => {
     })
 
     test('should go to a new page', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'gotoV4070',
@@ -178,7 +178,7 @@ describe('Basic library tests', () => {
     })
 
     test('should press keys', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'keydownV3120',
@@ -193,7 +193,7 @@ describe('Basic library tests', () => {
     })
 
     test('should click and drag', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'mouseClickDragV0300',
@@ -208,7 +208,7 @@ describe('Basic library tests', () => {
     })
 
     test('should scrape metadata', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'scrapeMetadata',
@@ -223,7 +223,7 @@ describe('Basic library tests', () => {
     })
 
     test('should interact with select list', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'selectList',
@@ -238,7 +238,7 @@ describe('Basic library tests', () => {
     })
 
     test('should solve captcha', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'solveCaptchaV450',
@@ -253,7 +253,7 @@ describe('Basic library tests', () => {
     })
 
     test('should switch browser tab', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'switchBrowserTab',
@@ -268,7 +268,7 @@ describe('Basic library tests', () => {
     })
 
     test('should hover', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'hover',
@@ -283,7 +283,7 @@ describe('Basic library tests', () => {
     })
 
     test('should restart browser', async() => {
-        nock('https://lar-simon.axiom.ai')
+        nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'browser',
                 method: 'AxiomApiRestartBrowser',

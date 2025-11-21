@@ -1,4 +1,4 @@
-const ENDPOINT = 'https://lar-simon.axiom.ai'
+const ENDPOINT = 'https://lar.axiom.ai'
 
 export class AxiomHttp {
 
