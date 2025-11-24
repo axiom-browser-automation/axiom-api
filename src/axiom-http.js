@@ -1,4 +1,4 @@
-const ENDPOINT = 'https://lar.axiom.ai'
+import { ENDPOINT } from "./config"
 
 export class AxiomHttp {
 
@@ -14,7 +14,12 @@ export class AxiomHttp {
         });
         if (!rawResponse.ok) {
             let errorContent = await rawResponse.text()
-            throw new Error(`HTTP ${rawResponse.status} error: ${errorContent}`);
+            switch (rawResponse.status) {
+                case 401:
+                    throw new Error("Failed to authenticate - please check your token.")
+                default:
+                    throw new Error(`HTTP ${rawResponse.status} error: ${errorContent}`)
+            }
         }
         const content = await rawResponse.json();
         return content

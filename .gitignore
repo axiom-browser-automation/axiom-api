@@ -49,4 +49,5 @@ Thumbs.db
 *.wmv
 
 test.js
+.env.*
 
