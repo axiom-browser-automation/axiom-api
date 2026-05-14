@@ -302,12 +302,12 @@ describe('Basic library tests', () => {
     describe('long-running step fallback', () => {
         const TEST_CDP_LINK = 'ws://test/devtools/browser/abc'
 
-        // Spy on http.post + wait so we can drive the timeout / polling state machine
+        // Spy on http.post + _sleep so we can drive the timeout / polling state machine
         // synchronously without burning real seconds on the exponential backoff.
         function makeApi() {
             const api = new AxiomApi('test-token')
             api.cdpLink = TEST_CDP_LINK
-            jest.spyOn(api, 'wait').mockResolvedValue()
+            jest.spyOn(api, '_sleep').mockResolvedValue()
             return api
         }
 
@@ -370,6 +370,37 @@ describe('Basic library tests', () => {
             await expect(api.step('browser', 'someMethod', [], ''))
                 .rejects.toThrow(/aborted/)
             expect(postSpy).toHaveBeenCalledTimes(1)
+        })
+    })
+
+    describe('wait()', () => {
+        test('with a session, routes through /step so the pod resets its inactivity timer', async () => {
+            const api = new AxiomApi('test-token')
+            api.cdpLink = 'ws://test/devtools/browser/abc'
+            const postSpy = jest.spyOn(api.http, 'post')
+                .mockResolvedValueOnce({message: 'ok'})
+
+            await api.wait(60_000)
+
+            expect(postSpy).toHaveBeenCalledTimes(1)
+            expect(postSpy.mock.calls[0][0]).toBe('/api/v5/step')
+            expect(postSpy.mock.calls[0][2]).toEqual({
+                mode: 'driver',
+                method: 'wait',
+                params: [60_000],
+                cdpLink: 'ws://test/devtools/browser/abc'
+            })
+        })
+
+        test('without a session, falls back to a local sleep — no HTTP call', async () => {
+            const api = new AxiomApi('test-token')
+            const sleepSpy = jest.spyOn(api, '_sleep').mockResolvedValue()
+            const postSpy = jest.spyOn(api.http, 'post')
+
+            await api.wait(1234)
+
+            expect(sleepSpy).toHaveBeenCalledWith(1234)
+            expect(postSpy).not.toHaveBeenCalled()
         })
     })
 

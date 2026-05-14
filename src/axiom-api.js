@@ -78,7 +78,7 @@ export class AxiomApi {
         const deadline = Date.now() + STEP_MAX_POLL_DURATION_MS
         let intervalMs = STEP_POLL_INITIAL_INTERVAL_MS
         while (Date.now() < deadline) {
-            await this.wait(intervalMs)
+            await this._sleep(intervalMs)
             try {
                 const content = await this.http.post('/api/v5/step/result', this.token, { cdpLink })
                 if (content && content.status === 'complete') return content.result
@@ -246,12 +246,22 @@ export class AxiomApi {
         )
     }
 
+    // Pause on the pod, not in the client process, so the pod's session inactivity
+    // timer is reset by the step. A purely local sleep would let the session idle
+    // out and auto-close while the client was still happily waiting. Falls back to
+    // a local sleep when there is no session — nothing to keep alive.
     async wait(time) {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve()
-            }, time)
-        })
+        if (this.cdpLink) {
+            return this.step('driver', 'wait', [time], this.cdpLink)
+        }
+        return this._sleep(time)
+    }
+
+    // Local-only sleep, used by the polling loop's backoff. Never routes to the
+    // pod — that would be circular (the polling loop's whole purpose is to wait
+    // out a pod-side step that has lost its HTTP connection).
+    _sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms))
     }
 
     async hover(select) {
