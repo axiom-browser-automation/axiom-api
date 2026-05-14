@@ -1,4 +1,15 @@
-import { AxiomHttp } from './axiom-http.js'
+import { AxiomHttp, AxiomHttpError } from './axiom-http.js'
+
+// Tuning for the transparent long-running-step polling fallback. The library POSTs
+// /step with STEP_HTTP_TIMEOUT_MS as the abort deadline; if the POST times out, hits
+// a gateway error, or the backend says a previous step is still in flight, the
+// library polls /step/result with exponential backoff until the result lands or
+// STEP_MAX_POLL_DURATION_MS elapses.
+const STEP_HTTP_TIMEOUT_MS = 120_000
+const STEP_MAX_POLL_DURATION_MS = 3_600_000
+const STEP_POLL_INITIAL_INTERVAL_MS = 3_000
+const STEP_POLL_MAX_INTERVAL_MS = 30_000
+const STEP_POLL_BACKOFF_FACTOR = 1.5
 
 /**
  * @class
@@ -28,20 +39,76 @@ export class AxiomApi {
         }
         const content = await this.http.post('/api/v5/browser/close', this.token, {cdpLink})
         // Reset CDPLink to avoid staleness
-        this.cdpLink = ''      
+        this.cdpLink = ''
         return content.message
     }
 
     // TODO: Probably should be mvoed to a non-user facing component
     async step(mode, method, params, cdpLink = '') {
-        const content = await this.http.post('/api/v5/step', this.token, {
-            mode, method, params, cdpLink
-        })
-        if (content.message) {
-            return content.message
-        } else {
+        try {
+            const content = await this.http.post('/api/v5/step', this.token, {
+                mode, method, params, cdpLink
+            }, { timeoutMs: STEP_HTTP_TIMEOUT_MS })
+            if (content && content.message !== undefined) {
+                return content.message
+            }
             return content
+        } catch (e) {
+            // Can only fall back to polling when there is a session to address.
+            // One-shot /step calls have no cdpLink and surface the original error.
+            if (!cdpLink || !this._shouldFallBackToPolling(e)) throw e
+            return this._pollStepResult(cdpLink, e)
         }
+    }
+
+    _shouldFallBackToPolling(error) {
+        // Direct POST never reached or never returned — step may still be running on the pod.
+        if (error && error.name === 'AbortError') return true
+        // Native fetch network failure (DNS, connection reset, etc.) surfaces as TypeError.
+        if (error && error.name === 'TypeError') return true
+        if (error instanceof AxiomHttpError) {
+            if (error.status === 502 || error.status === 503 || error.status === 504) return true
+            if (error.status === 409 && typeof error.message === 'string'
+                && error.message.indexOf('Step already in progress') !== -1) return true
+        }
+        return false
+    }
+
+    async _pollStepResult(cdpLink, originalError) {
+        const deadline = Date.now() + STEP_MAX_POLL_DURATION_MS
+        let intervalMs = STEP_POLL_INITIAL_INTERVAL_MS
+        while (Date.now() < deadline) {
+            await this.wait(intervalMs)
+            try {
+                const content = await this.http.post('/api/v5/step/result', this.token, { cdpLink })
+                if (content && content.status === 'complete') return content.result
+                if (content && content.status === 'running') {
+                    intervalMs = Math.min(intervalMs * STEP_POLL_BACKOFF_FACTOR, STEP_POLL_MAX_INTERVAL_MS)
+                    continue
+                }
+                if (content && content.status === 'none') {
+                    throw new Error('Step did not start on the pod. Original error: '
+                        + (originalError && originalError.message ? originalError.message : 'unknown'))
+                }
+                throw new Error('Unexpected /step/result response: ' + JSON.stringify(content))
+            } catch (e) {
+                // Executor is gone (step error → finish('Failure') removed it).
+                // Surface as a hard failure — the task report has the detail.
+                if (e instanceof AxiomHttpError && e.status === 409) {
+                    throw new Error('Step failed on the pod — check the task report. ' + (e.message || ''))
+                }
+                // Auth or other definite 4xx — don't keep polling.
+                if (e instanceof AxiomHttpError && e.status >= 400 && e.status < 500
+                    && e.status !== 502 && e.status !== 503 && e.status !== 504) {
+                    throw e
+                }
+                // Transient network issue mid-poll — back off and retry.
+                intervalMs = Math.min(intervalMs * STEP_POLL_BACKOFF_FACTOR, STEP_POLL_MAX_INTERVAL_MS)
+            }
+        }
+        throw new Error('Step polling exceeded ' + (STEP_MAX_POLL_DURATION_MS / 1000)
+            + 's. Original error: '
+            + (originalError && originalError.message ? originalError.message : 'unknown'))
     }
 
     async scrape(url, selector, pager, max_results, settings) {

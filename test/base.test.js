@@ -1,4 +1,6 @@
+import { jest } from '@jest/globals';
 import { AxiomApi } from '../src/axiom-api.js';
+import { AxiomHttpError } from '../src/axiom-http.js';
 import nock from 'nock';
 
 nock('https://lar.axiom.ai')
@@ -290,11 +292,85 @@ describe('Basic library tests', () => {
                 params: [],
                 cdpLink: ''
             })
-            .reply(200, 
+            .reply(200,
                 {message: 'Step command executed successfully.'}
             )
         const results = await axiomApi.restartBrowser()
         expect(results).toBe('Step command executed successfully.')
+    })
+
+    describe('long-running step fallback', () => {
+        const TEST_CDP_LINK = 'ws://test/devtools/browser/abc'
+
+        // Spy on http.post + wait so we can drive the timeout / polling state machine
+        // synchronously without burning real seconds on the exponential backoff.
+        function makeApi() {
+            const api = new AxiomApi('test-token')
+            api.cdpLink = TEST_CDP_LINK
+            jest.spyOn(api, 'wait').mockResolvedValue()
+            return api
+        }
+
+        test('POST timeout falls through to polling, returns the eventual result', async () => {
+            const api = makeApi()
+            const abortErr = new Error('aborted')
+            abortErr.name = 'AbortError'
+            const postSpy = jest.spyOn(api.http, 'post')
+            postSpy.mockImplementationOnce(() => Promise.reject(abortErr))
+            postSpy.mockImplementationOnce(() => Promise.resolve({status: 'running'}))
+            postSpy.mockImplementationOnce(() => Promise.resolve({status: 'complete', result: ['scraped', 'data']}))
+
+            const result = await api.step('browser', 'AxiomApiSmartScrapeV440', [], TEST_CDP_LINK)
+            expect(result).toStrictEqual(['scraped', 'data'])
+            expect(postSpy).toHaveBeenCalledTimes(3)
+            expect(postSpy.mock.calls[0][0]).toBe('/api/v5/step')
+            expect(postSpy.mock.calls[1][0]).toBe('/api/v5/step/result')
+            expect(postSpy.mock.calls[2][0]).toBe('/api/v5/step/result')
+        })
+
+        test('409 "Step already in progress" on /step falls through to polling', async () => {
+            const api = makeApi()
+            const inProgress = new AxiomHttpError(
+                'Step already in progress for this session',
+                409,
+                {status: 'error', message: 'Step already in progress for this session'}
+            )
+            const postSpy = jest.spyOn(api.http, 'post')
+            postSpy.mockImplementationOnce(() => Promise.reject(inProgress))
+            postSpy.mockImplementationOnce(() => Promise.resolve({status: 'complete', result: 'ok'}))
+
+            const result = await api.step('browser', 'someMethod', [], TEST_CDP_LINK)
+            expect(result).toBe('ok')
+        })
+
+        test('step error on the pod surfaces as a thrown error pointing at the task report', async () => {
+            const api = makeApi()
+            const abortErr = new Error('aborted')
+            abortErr.name = 'AbortError'
+            const gone = new AxiomHttpError(
+                'No running browser session for cdpLink ' + TEST_CDP_LINK,
+                409,
+                {status: 'error', message: 'No running browser session for cdpLink ' + TEST_CDP_LINK}
+            )
+            const postSpy = jest.spyOn(api.http, 'post')
+            postSpy.mockImplementationOnce(() => Promise.reject(abortErr))
+            postSpy.mockImplementationOnce(() => Promise.reject(gone))
+
+            await expect(api.step('browser', 'someMethod', [], TEST_CDP_LINK))
+                .rejects.toThrow(/check the task report/)
+        })
+
+        test('one-shot step (no cdpLink) does not fall back to polling', async () => {
+            const api = makeApi()
+            const abortErr = new Error('aborted')
+            abortErr.name = 'AbortError'
+            const postSpy = jest.spyOn(api.http, 'post')
+            postSpy.mockImplementationOnce(() => Promise.reject(abortErr))
+
+            await expect(api.step('browser', 'someMethod', [], ''))
+                .rejects.toThrow(/aborted/)
+            expect(postSpy).toHaveBeenCalledTimes(1)
+        })
     })
 
 });
