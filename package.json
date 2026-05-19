@@ -1,5 +1,5 @@
 {
-  "name": "axiom-api",
+  "name": "@axiom-ai/api",
   "author": "Axiom.ai",
   "type": "module",
   "version": "1.0.0",
