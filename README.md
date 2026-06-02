@@ -13,16 +13,16 @@ To use the library, you'll first need to import the `AxiomApi` class and then wr
 Here is a basic example of how to structure your code:
 
 ```javascript
-import { AxiomApi } from 'axiom-api';
+import { AxiomApi } from '@axiom_ai/api';
 
 async function run() {
     // 1. Initialize the AxiomApi class
     const axiom = new AxiomApi('[API_KEY]');
-    
+
     // 2. Open the browser connection
     await axiom.browserOpen();
 
-    // 3. Add your automation steps here (e.g., axiom.click(), axiom.type(), etc.)
+    // 3. Add your automation steps here (e.g., axiom.goto(), axiom.click(), axiom.enterText(), axiom.scrape(), etc.)
     // ... add steps ...
 
     // 4. Close the browser connection when done
@@ -30,3 +30,4 @@ async function run() {
 }
 
 run();
+```
