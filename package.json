@@ -2,7 +2,7 @@
   "name": "@axiom_ai/api",
   "author": "Axiom.ai",
   "type": "module",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Library for interacting with Axiom.ai browser infrastructure",
   "main": "dist/cjs/index.js",
   "module": "dist/es/index.js",
