@@ -31,3 +31,13 @@ async function run() {
 
 run();
 ```
+
+## Working with Claude Code (or other agents)
+
+This package bundles agent-targeted documentation alongside the runtime:
+
+- [`CLAUDE.md`](./CLAUDE.md) — full method surface, error semantics, common patterns, auth + signup, and the methods *not* to call. Read by Claude automatically when this package is installed in a project.
+- [`AGENTS.md`](./AGENTS.md) — same content, surfaced for non-Claude agents that follow the `AGENTS.md` convention.
+- [`examples/`](./examples/) — three runnable scripts (`simple-scrape.js`, `login-then-extract.js`, `parallel-sessions.js`).
+
+If you want Claude to *invent* an axiom from a prompt rather than help you write API calls yourself, also see [`@axiom_ai/claude-skill`](https://github.com/axiom-browser-automation/claude-skill) — the marketplace plugin covers both this library and the no-code dashboard path.

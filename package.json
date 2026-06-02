@@ -8,7 +8,10 @@
   "module": "dist/es/index.js",
   "types": "dist/es/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "CLAUDE.md",
+    "AGENTS.md",
+    "examples"
   ],
   "scripts": {
     "build:js": "vite build --mode production",
@@ -56,7 +59,11 @@
     "axiom.ai",
     "sdk",
     "browser",
-    "automation"
+    "automation",
+    "claude",
+    "claude-code",
+    "agents-md",
+    "llm-friendly"
   ],
   "license": "ISC",
   "bugs": {
