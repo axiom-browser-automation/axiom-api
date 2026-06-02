@@ -1,4 +1,4 @@
-import { ENDPOINT } from "./config"
+import { ENDPOINT } from "./config.js"
 
 export class AxiomHttpError extends Error {
     constructor(message, status, body) {

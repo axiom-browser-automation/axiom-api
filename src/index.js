@@ -1,1 +1,1 @@
-export { AxiomApi } from "./axiom-api"
+export { AxiomApi } from "./axiom-api.js"

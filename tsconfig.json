@@ -1,13 +1,14 @@
 // tsconfig.json (Minimal for JSDoc and Types)
 {
   "compilerOptions": {
-    "allowJs": true, 
+    "allowJs": true,
     "checkJs": false,
     "module": "ESNext",
     "moduleResolution": "Node",
     "declaration": true,
+    "emitDeclarationOnly": true,
     "rootDir": "src",
-    "outDir": "./dist/es",  
+    "outDir": "./dist/es",
     "skipLibCheck": true,
     "esModuleInterop": true
   },
