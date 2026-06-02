@@ -11,6 +11,111 @@ const STEP_POLL_INITIAL_INTERVAL_MS = 3_000
 const STEP_POLL_MAX_INTERVAL_MS = 30_000
 const STEP_POLL_BACKOFF_FACTOR = 1.5
 
+// Mirrors the metadataOptions list in axiom_extension
+// (src/axiombuilder/components/params/Metadata.vue). The cloud-side driver
+// (axiom_lib AxiomApiDriver.scrapeMetadata) keys off `item.id` and `item.value`,
+// so each entry must match the extension's shape exactly. Keep in sync when the
+// extension's catalog changes.
+const SCRAPE_METADATA_CATALOG = [
+    { name: 'Title', value: 'title', description: '<title> tag', category: 'General Metadata', id: 'general_metadata_title' },
+    { name: 'Description', value: "meta[name='description']", description: '<meta name="description" content="...">', category: 'General Metadata', id: 'general_metadata_description' },
+    { name: 'Keywords', value: "meta[name='keywords']", description: '<meta name="keywords" content="...">', category: 'General Metadata', id: 'general_metadata_keywords' },
+    { name: 'Viewport', value: "meta[name='viewport']", description: '<meta name="viewport" content="...">', category: 'General Metadata', id: 'general_metadata_viewport' },
+    { name: 'Author', value: "meta[name='author']", description: '<meta name="author" content="...">', category: 'General Metadata', id: 'general_metadata_author' },
+    { name: 'Generator', value: "meta[name='generator']", description: '<meta name="generator" content="...">', category: 'General Metadata', id: 'general_metadata_generator' },
+    { name: 'Copyright', value: "meta[name='copyright']", description: '<meta name="copyright" content="...">', category: 'General Metadata', id: 'general_metadata_copyright' },
+    { name: 'Title', value: "meta[property='og:title']", description: '<meta property="og:title" content="...">', category: 'Open Graph (OG) Metadata', id: 'open_graph_(og)_metadata_title' },
+    { name: 'Description', value: "meta[property='og:description']", description: '<meta property="og:description" content="...">', category: 'Open Graph (OG) Metadata', id: 'open_graph_(og)_metadata_description' },
+    { name: 'Image', value: "meta[property='og:image']", description: '<meta property="og:image" content="...">', category: 'Open Graph (OG) Metadata', id: 'open_graph_(og)_metadata_image' },
+    { name: 'URL', value: "meta[property='og:url']", description: '<meta property="og:url" content="...">', category: 'Open Graph (OG) Metadata', id: 'open_graph_(og)_metadata_url' },
+    { name: 'Type', value: "meta[property='og:type']", description: '<meta property="og:type" content="...">', category: 'Open Graph (OG) Metadata', id: 'open_graph_(og)_metadata_type' },
+    { name: 'Site Name', value: "meta[property='og:site_name']", description: '<meta property="og:site_name" content="...">', category: 'Open Graph (OG) Metadata', id: 'open_graph_(og)_metadata_site_name' },
+    { name: 'Card Type', value: "meta[name='twitter:card']", description: '<meta name="twitter:card" content="...">', category: 'Twitter Card Metadata', id: 'twitter_card_metadata_card_type' },
+    { name: 'Title', value: "meta[name='twitter:title']", description: '<meta name="twitter:title" content="...">', category: 'Twitter Card Metadata', id: 'twitter_card_metadata_title' },
+    { name: 'Description', value: "meta[name='twitter:description']", description: '<meta name="twitter:description" content="...">', category: 'Twitter Card Metadata', id: 'twitter_card_metadata_description' },
+    { name: 'Image', value: "meta[name='twitter:image']", description: '<meta name="twitter:image" content="...">', category: 'Twitter Card Metadata', id: 'twitter_card_metadata_image' },
+    { name: 'Site Handle', value: "meta[name='twitter:site']", description: '<meta name="twitter:site" content="...">', category: 'Twitter Card Metadata', id: 'twitter_card_metadata_site_handle' },
+    { name: 'Canonical URL', value: "link[rel='canonical']", description: '<link rel="canonical" href="...">', category: 'SEO Metadata', id: 'seo_metadata_canonical_url' },
+    { name: 'Robots Directive', value: "meta[name='robots']", description: '<meta name="robots" content="...">', category: 'SEO Metadata', id: 'seo_metadata_robots_directive' },
+    { name: 'Hreflang Tags', value: "link[rel='alternate'][hreflang]", description: '<link rel="alternate" hreflang="en-us" href="...">', category: 'SEO Metadata', id: 'seo_metadata_hreflang_tags' },
+    { name: 'Pagination (prev)', value: "link[rel='prev']", description: '<link rel="prev" href="...">', category: 'SEO Metadata', id: 'seo_metadata_pagination_(prev)' },
+    { name: 'Pagination (next)', value: "link[rel='next']", description: '<link rel="next" href="...">', category: 'SEO Metadata', id: 'seo_metadata_pagination_(next)' },
+    { name: 'Breadcrumbs', value: '@type=BreadcrumbList', description: '@type: BreadcrumbList', category: 'Schema.org Structured Data', id: 'schema.org_structured_data_breadcrumbs' },
+    { name: 'Product Details', value: '@type=Product', description: '@type: Product', category: 'Schema.org Structured Data', id: 'schema.org_structured_data_product_details' },
+    { name: 'Organization Info', value: '@type=Organization', description: '@type: Organization', category: 'Schema.org Structured Data', id: 'schema.org_structured_data_organization_info' },
+    { name: 'Article/Blog Post Info', value: '@type=Article', description: '@type: Article', category: 'Schema.org Structured Data', id: 'schema.org_structured_data_article/blog_post_info' },
+    { name: 'Event Details', value: '@type=Event', description: '@type: Event', category: 'Schema.org Structured Data', id: 'schema.org_structured_data_event_details' },
+    { name: 'Favicon', value: "link[rel='icon']", description: '<link rel="icon" href="...">', category: 'Link Metadata', id: 'link_metadata_favicon' },
+    { name: 'Stylesheets', value: "link[rel='stylesheet']", description: '<link rel="stylesheet" href="...">', category: 'Link Metadata', id: 'link_metadata_stylesheets' },
+    { name: 'RSS Feeds', value: "link[rel='alternate'][type='application/rss+xml']", description: '<link rel="alternate" type="application/rss+xml" href="...">', category: 'Link Metadata', id: 'link_metadata_rss_feeds' },
+    { name: 'Preload', value: "link[rel='preload']", description: '<link rel="preload" href="...">', category: 'Performance Metadata', id: 'performance_metadata_preload' },
+    { name: 'Prefetch', value: "link[rel='prefetch']", description: '<link rel="prefetch" href="...">', category: 'Performance Metadata', id: 'performance_metadata_prefetch' },
+    { name: 'Facebook App ID', value: "meta[property='fb:app_id']", description: '<meta property="fb:app_id" content="...">', category: 'Social Media and Sharing', id: 'social_media_and_sharing_facebook_app_id' },
+    { name: 'Google Verification', value: "meta[name='google-site-verification']", description: '<meta name="google-site-verification" content="...">', category: 'Social Media and Sharing', id: 'social_media_and_sharing_google_verification' },
+    { name: 'Bing Verification', value: "meta[name='msvalidate.01']", description: '<meta name="msvalidate.01" content="...">', category: 'Social Media and Sharing', id: 'social_media_and_sharing_bing_verification' },
+    { name: 'Pinterest Verification', value: "meta[name='p:domain_verify']", description: '<meta name="p:domain_verify" content="...">', category: 'Social Media and Sharing', id: 'social_media_and_sharing_pinterest_verification' },
+    { name: 'Google Analytics ID', value: 'script[src*="gtag.js"], script[src*="analytics.js"]', description: 'Found in <script> tags with gtag.js or analytics.js.', category: 'Analytics and Tracking', id: 'analytics_and_tracking_google_analytics_id' },
+    { name: 'Facebook Pixel ID', value: 'script[src*="connect.facebook.net"]', description: 'Found in <script> tags.', category: 'Analytics and Tracking', id: 'analytics_and_tracking_facebook_pixel_id' },
+]
+
+const SCRAPE_METADATA_CATEGORY_PREFIXES = {
+    general:   'General Metadata',
+    og:        'Open Graph (OG) Metadata',
+    twitter:   'Twitter Card Metadata',
+    seo:       'SEO Metadata',
+    schema:    'Schema.org Structured Data',
+    link:      'Link Metadata',
+    perf:      'Performance Metadata',
+    social:    'Social Media and Sharing',
+    analytics: 'Analytics and Tracking',
+}
+
+const SCRAPE_METADATA_BY_ALIAS = (() => {
+    const map = new Map()
+    for (const item of SCRAPE_METADATA_CATALOG) {
+        map.set(item.id, item)
+        const short = item.name.toLowerCase()
+        if (!map.has(short)) map.set(short, item)
+    }
+    for (const [prefix, category] of Object.entries(SCRAPE_METADATA_CATEGORY_PREFIXES)) {
+        for (const item of SCRAPE_METADATA_CATALOG) {
+            if (item.category === category) {
+                map.set(`${prefix}:${item.name.toLowerCase()}`, item)
+            }
+        }
+    }
+    // Schema.org entries also get an alias matching their @type name (e.g. `schema:Product`,
+    // `schema:Article`) — that's what developers actually look up, vs the catalog's
+    // human-friendly labels like `'Product Details'`.
+    for (const item of SCRAPE_METADATA_CATALOG) {
+        if (item.category === 'Schema.org Structured Data') {
+            const m = item.value.match(/^@type=(\w+)$/)
+            if (m) map.set(`schema:${m[1].toLowerCase()}`, item)
+        }
+    }
+    return map
+})()
+
+function resolveScrapeMetadataItem(item) {
+    if (item && typeof item === 'object' && typeof item.id === 'string') {
+        return item
+    }
+    if (typeof item === 'string') {
+        const resolved = SCRAPE_METADATA_BY_ALIAS.get(item.toLowerCase())
+        if (!resolved) {
+            throw new Error(
+                `scrapeMetadata: unknown field "${item}". Pass a short name (e.g. "title"), ` +
+                `a prefixed alias (e.g. "og:title", "twitter:image", "schema:Product"), a full id ` +
+                `(e.g. "general_metadata_title"), or a complete descriptor object.`
+            )
+        }
+        return resolved
+    }
+    throw new Error(
+        `scrapeMetadata: each item must be a string alias or a descriptor object with an "id" property (got ${typeof item})`
+    )
+}
+
 /**
  * @class
  * @public
@@ -210,11 +315,13 @@ export class AxiomApi {
         )
     }
 
-    async scrapeMetadata(metadata) {
+    async scrapeMetadata(fields) {
+        const items = Array.isArray(fields) ? fields : [fields]
+        const resolved = items.map(resolveScrapeMetadataItem)
         return this.step(
             'driver',
             'scrapeMetadata',
-            [metadata],
+            [resolved],
             this.cdpLink
         )
     }

@@ -209,19 +209,61 @@ describe('Basic library tests', () => {
         expect(results).toBe('Step command executed successfully.')
     })
 
-    test('should scrape metadata', async() => {
+    test('should scrape metadata from string aliases (short name + prefixed)', async() => {
         nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'driver',
                 method: 'scrapeMetadata',
-                params: [{}],
+                params: [[
+                    { name: 'Title', value: 'title', description: '<title> tag', category: 'General Metadata', id: 'general_metadata_title' },
+                    { name: 'Image', value: "meta[property='og:image']", description: '<meta property="og:image" content="...">', category: 'Open Graph (OG) Metadata', id: 'open_graph_(og)_metadata_image' },
+                    { name: 'Product Details', value: '@type=Product', description: '@type: Product', category: 'Schema.org Structured Data', id: 'schema.org_structured_data_product_details' },
+                ]],
                 cdpLink: ''
             })
-            .reply(200, 
-                [['Page metadata']]
+            .reply(200,
+                [['Example Domain'], ['https://example.com/og.png'], ['{"@type":"Product"}']]
             )
-        const results = await axiomApi.scrapeMetadata({})
-        expect(results).toStrictEqual([['Page metadata']])
+        const results = await axiomApi.scrapeMetadata(['title', 'og:image', 'schema:Product'])
+        expect(results).toStrictEqual([['Example Domain'], ['https://example.com/og.png'], ['{"@type":"Product"}']])
+    })
+
+    test('should pass through full metadata descriptor objects', async() => {
+        const descriptor = { name: 'Title', value: 'title', description: '<title> tag', category: 'General Metadata', id: 'general_metadata_title' }
+        nock('https://lar.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'scrapeMetadata',
+                params: [[descriptor]],
+                cdpLink: ''
+            })
+            .reply(200,
+                [['Example Domain']]
+            )
+        const results = await axiomApi.scrapeMetadata([descriptor])
+        expect(results).toStrictEqual([['Example Domain']])
+    })
+
+    test('should resolve full id strings to descriptors', async() => {
+        nock('https://lar.axiom.ai')
+            .post('/api/v5/step', {
+                mode: 'driver',
+                method: 'scrapeMetadata',
+                params: [[
+                    { name: 'Title', value: 'title', description: '<title> tag', category: 'General Metadata', id: 'general_metadata_title' },
+                ]],
+                cdpLink: ''
+            })
+            .reply(200,
+                [['Example Domain']]
+            )
+        const results = await axiomApi.scrapeMetadata(['general_metadata_title'])
+        expect(results).toStrictEqual([['Example Domain']])
+    })
+
+    test('should throw on unknown metadata alias', async() => {
+        await expect(axiomApi.scrapeMetadata(['this-is-not-a-real-field']))
+            .rejects.toThrow(/unknown field "this-is-not-a-real-field"/)
     })
 
     test('should interact with select list', async() => {

@@ -50,7 +50,7 @@ Every method below is on the `AxiomApi` class. Construct with `new AxiomApi(apiK
 | Method | Notes |
 |---|---|
 | `scrape(url, selector, pager, max_results, settings)` | Smart-scrape rows. Pass `null` for `url` to scrape the current page. Returns an array of objects. |
-| `scrapeMetadata(metadata)` | Extract structured page-level fields (title, OG tags, schema.org blocks). |
+| `scrapeMetadata(fields)` | Extract structured page-level fields. `fields` is an array — items may be short aliases (`'title'`, `'description'`, `'keywords'`), category-prefixed aliases (`'og:title'`, `'twitter:image'`, `'schema:Product'`, `'seo:canonical url'`), full ids (`'general_metadata_title'`), or complete descriptor objects (passed through). Unknown aliases throw. |
 | `getClipboardContents()` | Read the cloud browser's clipboard (after a copy step). |
 
 ### AI and utility
