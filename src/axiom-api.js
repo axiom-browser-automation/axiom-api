@@ -114,7 +114,7 @@ export class AxiomApi {
     async scrape(url, selector, pager, max_results, settings) {
         return this.step(
             'browser',
-            'AxiomApiSmartScrapeV440',
+            'AxiomApiSmartScrapeV4400',
             [url, selector, pager, max_results, settings],
             this.cdpLink
         )

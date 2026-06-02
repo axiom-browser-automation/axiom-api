@@ -48,7 +48,7 @@ describe('Basic library tests', () => {
         nock('https://lar.axiom.ai')
             .post('/api/v5/step', {
                 mode: 'browser',
-                method: 'AxiomApiSmartScrapeV440',
+                method: 'AxiomApiSmartScrapeV4400',
                 params: ['https://test', 'test', 'test', 20, {}],
                 cdpLink: ''
             })
@@ -320,7 +320,7 @@ describe('Basic library tests', () => {
             postSpy.mockImplementationOnce(() => Promise.resolve({status: 'running'}))
             postSpy.mockImplementationOnce(() => Promise.resolve({status: 'complete', result: ['scraped', 'data']}))
 
-            const result = await api.step('browser', 'AxiomApiSmartScrapeV440', [], TEST_CDP_LINK)
+            const result = await api.step('browser', 'AxiomApiSmartScrapeV4400', [], TEST_CDP_LINK)
             expect(result).toStrictEqual(['scraped', 'data'])
             expect(postSpy).toHaveBeenCalledTimes(3)
             expect(postSpy.mock.calls[0][0]).toBe('/api/v5/step')
