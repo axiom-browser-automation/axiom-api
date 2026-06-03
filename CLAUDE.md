@@ -49,7 +49,7 @@ Every method below is on the `AxiomApi` class. Construct with `new AxiomApi(apiK
 
 | Method | Notes |
 |---|---|
-| `scrape(url, selector, pager, max_results, settings)` | Smart-scrape rows. Pass `null` for `url` to scrape the current page. Returns an array of objects. |
+| `scrape(url, selector, pager, max_results, settings)` | Smart-scrape rows. `scrape` navigates to `url` (or to each URL in turn if given an array) and extracts matching rows in the same call — `url` is required, do not pass `null`. Browser session/cookies persist across the internal navigation, so this works after a login flow too: just pass the post-login page's URL. Returns an array of objects. |
 | `scrapeMetadata(fields)` | Extract structured page-level fields. `fields` is an array — items may be short aliases (`'title'`, `'description'`, `'keywords'`), category-prefixed aliases (`'og:title'`, `'twitter:image'`, `'schema:Product'`, `'seo:canonical url'`), full ids (`'general_metadata_title'`), or complete descriptor objects (passed through). Unknown aliases throw. |
 | `getClipboardContents()` | Read the cloud browser's clipboard (after a copy step). |
 
@@ -72,7 +72,7 @@ These exist on the class but are not part of the public surface — don't emit t
 
 ## Common patterns
 
-### Simplest scrape — open, navigate, scrape, close
+### Simplest scrape — open, scrape (navigates internally), close
 
 ```javascript
 import { AxiomApi } from '@axiom_ai/api'
@@ -80,8 +80,8 @@ import { AxiomApi } from '@axiom_ai/api'
 const axiom = new AxiomApi(process.env.AXIOM_API_KEY)
 await axiom.browserOpen()
 try {
-    await axiom.goto('https://example.com/products')
-    const rows = await axiom.scrape(null, '.product-card', null, 50, {})
+    // scrape() navigates to the URL and extracts in one call.
+    const rows = await axiom.scrape('https://example.com/products', '.product-card', null, 50, {})
     console.log(`Found ${rows.length} products`)
 } finally {
     await axiom.browserClose()
@@ -96,7 +96,8 @@ await axiom.enterText('input[name=email]', process.env.LOGIN_EMAIL)
 await axiom.enterText('input[name=password]', process.env.LOGIN_PASSWORD)
 await axiom.click('button[type=submit]')
 await axiom.wait(2000)                              // settle on the dashboard
-const rows = await axiom.scrape(null, '.row', null, 100, {})
+// Session/cookies persist, so scrape can navigate to the authenticated page directly.
+const rows = await axiom.scrape('https://example.com/dashboard', '.row', null, 100, {})
 ```
 
 ### Parallel sessions
@@ -108,8 +109,8 @@ const a = new AxiomApi(KEY); const b = new AxiomApi(KEY)
 await Promise.all([a.browserOpen(), b.browserOpen()])
 try {
     const [rowsA, rowsB] = await Promise.all([
-        a.goto('https://a.test').then(() => a.scrape(null, '.row', null, 50, {})),
-        b.goto('https://b.test').then(() => b.scrape(null, '.row', null, 50, {})),
+        a.scrape('https://a.test', '.row', null, 50, {}),
+        b.scrape('https://b.test', '.row', null, 50, {}),
     ])
 } finally {
     await Promise.all([a.browserClose(), b.browserClose()])

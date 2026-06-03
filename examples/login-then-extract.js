@@ -14,8 +14,8 @@ async function main() {
     // Wait on the pod (keeps the session alive) rather than a local setTimeout.
     await axiom.wait(2000)
 
-    await axiom.goto('https://example.com/dashboard')
-    const rows = await axiom.scrape(null, '.report-row', null, 100, {})
+    // Session/cookies persist, so scrape navigates to the authenticated page directly.
+    const rows = await axiom.scrape('https://example.com/dashboard', '.report-row', null, 100, {})
     return rows
   } finally {
     await axiom.browserClose()

@@ -1,4 +1,4 @@
-// Smallest valid axiom: open browser, navigate, scrape, close.
+// Smallest valid axiom: open browser, scrape (navigates internally), close.
 // Validator checks: methods on allowlist, try/finally lifecycle, no hardcoded token.
 
 import { AxiomApi } from '@axiom_ai/api'
@@ -8,8 +8,8 @@ async function main() {
 
   await axiom.browserOpen()
   try {
-    await axiom.goto('https://example.com/products')
-    const rows = await axiom.scrape(null, '.product-card', null, 50, {})
+    // scrape() navigates to the URL and extracts in one call.
+    const rows = await axiom.scrape('https://example.com/products', '.product-card', null, 50, {})
     console.log(`Found ${rows.length} products`)
     return rows
   } finally {
