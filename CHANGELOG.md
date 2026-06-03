@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.4 — docs: `examples/` and `CLAUDE.md` now pass the URL to `scrape()` instead of the unsupported `scrape(null)` pattern
+
+The agent-targeted docs bundled in v1.0.2/v1.0.3 taught a broken pattern: `await axiom.goto(url)` then `await axiom.scrape(null, selector, …)` to "scrape the current page." The API doesn't support that — `scrape()` is designed to navigate itself (it calls `this.driver.goto(url)` internally and extracts in the same call). Passing `null` for the URL crashes the cloud driver with a 500 (`Cannot read properties of null (reading 'length')`). There is no supported "scrape the page I'm already on" mode.
+
+The authoritative top-level `README.md` was already correct; only the bundled `CLAUDE.md` and `examples/*.js` shipped the wrong pattern. Since those files ride in the npm tarball at `node_modules/@axiom_ai/api/`, every consumer asking Claude for help has been getting an incorrect prescription.
+
+Fix (docs-only, no `src/` changes):
+
+- `CLAUDE.md` — `scrape()` row in the method table now states `url` is required and notes that cookies persist across the internal navigation (so it works after a login flow too). All three example blocks in the "Common patterns" section drop the separate `goto()` and pass the URL directly to `scrape(url, selector, …)`.
+- `examples/simple-scrape.js`, `examples/login-then-extract.js`, `examples/parallel-sessions.js` — same correction. `login-then-extract.js` keeps the login `goto`/`enterText`/`click`/`wait` sequence; only the post-authentication `goto + scrape(null)` pair collapses into a single `scrape(url)`.
+
+Tests still 29/29 (no `src/` changes). The validator-enforced `browserOpen() / try / finally / browserClose()` lifecycle and the no-hardcoded-token invariant remain intact in every example.
+
 ## 1.0.2 — fix: `scrape()` was calling a misspelt backend method; bundled agent docs
 
 Two changes shipped together:
